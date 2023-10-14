@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook from react-router-dom
+import { useNavigate } from 'react-router-dom';
 
 const DesktopContainer = styled.div`
     height: 100vh;
@@ -21,15 +21,15 @@ const Button = styled.button`
 `;
 
 const Desktop = () => {
-    const navigate = useNavigate(); // Get the useNavigate hook
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         console.log('Logging out...');
-        localStorage.removeItem('token'); // Remove the JWT token from local storage
+        localStorage.removeItem('token'); // ending session
         const token = localStorage.getItem('token');
         if (!token) {
             console.log("Token removed successfully.");
-            navigate('/'); // Redirect the user to the landing page
+            navigate('/');
         } else {
             console.log("Failed to remove token.");
         }
@@ -39,7 +39,6 @@ const Desktop = () => {
     return (
         <DesktopContainer>
             <Button onClick={handleLogout}>Log Out</Button>
-            {/* You can add other desktop elements here */}
         </DesktopContainer>
     );
 };

@@ -1,6 +1,57 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';  // ensure this import exists
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+
+const FormContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: white;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #34495e;
+  color: white;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+
+  &:focus {
+    background-color: #5a7591;
+    outline: none;
+  }
+`;
+
+const Button = styled.button`
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #c0392b;
+  }
+`;
+
+const Message = styled.p`
+  font-size: 0.9em;
+  color: #e74c3c;
+`;
+
+const FormTitle = styled.h2`
+  color: white;
+  font-size: 2em;
+  margin-bottom: 15px;
+  text-align: center;
+`;
+
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -17,38 +68,38 @@ function Login() {
             });
             console.log('Server response:', response.data);
             setMessage(response.data.message);
-            if (response.status === 200) {  // Adjusted this line
+            if (response.status === 200) { 
                 console.log("Token received:", response.data.token);
-                localStorage.setItem('token', response.data.token); // Storing JWT for session handling
+                localStorage.setItem('token', response.data.token); // Store the token in local storage for sessions
                 navigate('/desktop');
             } else {
                 console.log("Login unsuccessful.");
             }
         } catch (error) {
             console.log('Error while logging in:', error);
-            setMessage(error.response?.data?.message || 'Login failed');  // Safe-check in case error.response is undefined
+            setMessage(error.response?.data?.message || 'Login failed');
         }
     };
     
     
 
     return (
-        <div>
-            <h2>Login</h2>
-            <input 
+        <FormContainer>
+            <FormTitle>Login</FormTitle>
+            <Input 
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
             />
-            <input 
+            <Input 
                 type="password" 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
             />
-            <button onClick={loginUser}>Login</button>
-            {message && <p>{message}</p>}
-        </div>
+            <Button onClick={loginUser}>Login</Button>
+            {message && <Message>{message}</Message>}
+        </FormContainer>
     );
 }
 
