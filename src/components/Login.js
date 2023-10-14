@@ -17,7 +17,7 @@ function Login() {
             });
             console.log('Server response:', response.data);
             setMessage(response.data.message);
-            if (response.data.success) {
+            if (response.status === 200) {  // Adjusted this line
                 console.log("Token received:", response.data.token);
                 localStorage.setItem('token', response.data.token); // Storing JWT for session handling
                 navigate('/desktop');
@@ -26,9 +26,10 @@ function Login() {
             }
         } catch (error) {
             console.log('Error while logging in:', error);
-            setMessage(error.response.data.message);
+            setMessage(error.response?.data?.message || 'Login failed');  // Safe-check in case error.response is undefined
         }
     };
+    
     
 
     return (

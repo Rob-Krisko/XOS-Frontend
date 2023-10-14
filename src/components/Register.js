@@ -7,6 +7,7 @@ function Register() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [fullName, setFullName] = useState(''); // Added fullName state
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ function Register() {
         }
         try {
             const response = await axios.post('http://localhost:5000/register', {
-                username, email, password
+                username, email, password, fullName  // Added fullName to the payload
             });
             console.log('Server response:', response.data);
             setMessage(response.data.message);
@@ -33,7 +34,6 @@ function Register() {
             setMessage(error.response.data.message);
         }
     };
-    
 
     return (
         <div>
@@ -42,6 +42,11 @@ function Register() {
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
+            />
+            <input 
+                value={fullName}  // Added input field for fullName
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Full Name"
             />
             <input 
                 value={email}
