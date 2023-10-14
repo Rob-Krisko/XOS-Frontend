@@ -52,7 +52,7 @@ const FormTitle = styled.h2`
   text-align: center;
 `;
 
-function Register() {
+function Register({ switchToLogin }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -75,7 +75,8 @@ function Register() {
             console.log('Server response:', response.data);
             setMessage(response.data.message);
             if (response.data.success) {
-                navigate('/login');
+                setMessage("Registration successful! Please login.");
+                switchToLogin(); // switch to login view in the modal
             } else {
                 console.log("Registration unsuccessful.");
             }

@@ -37,26 +37,23 @@ const Button = styled.button`
 `;
 
 const LandingPage = () => {
-    const [showLoginModal, setShowLoginModal] = useState(false);
-    const [showRegisterModal, setShowRegisterModal] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalView, setModalView] = useState('login'); // 'login' or 'register'
 
     return (
         <LandingContainer>
             <Title>Welcome to XOS</Title>
             <div>
-                <Button onClick={() => setShowLoginModal(true)}>Login</Button>
-                <Button onClick={() => setShowRegisterModal(true)}>Register</Button>
+                <Button onClick={() => { setShowModal(true); setModalView('login'); }}>Login</Button>
+                <Button onClick={() => { setShowModal(true); setModalView('register'); }}>Register</Button>
             </div>
 
-            <Modal show={showLoginModal} onClose={() => setShowLoginModal(false)}>
-                <Login />
-            </Modal>
-
-            <Modal show={showRegisterModal} onClose={() => setShowRegisterModal(false)}>
-                <Register />
+            <Modal show={showModal} onClose={() => setShowModal(false)}>
+                {modalView === 'login' ? <Login switchToRegister={() => setModalView('register')} /> : <Register switchToLogin={() => setModalView('login')} />}
             </Modal>
         </LandingContainer>
     );
 };
+
 
 export default LandingPage;

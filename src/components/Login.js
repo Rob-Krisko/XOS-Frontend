@@ -53,7 +53,7 @@ const FormTitle = styled.h2`
 `;
 
 
-function Login() {
+function Login({ switchToRegister }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -80,8 +80,6 @@ function Login() {
             setMessage(error.response?.data?.message || 'Login failed');
         }
     };
-    
-    
 
     return (
         <FormContainer>
@@ -99,6 +97,7 @@ function Login() {
             />
             <Button onClick={loginUser}>Login</Button>
             {message && <Message>{message}</Message>}
+            <Button onClick={switchToRegister}>Register a new account</Button>
         </FormContainer>
     );
 }
