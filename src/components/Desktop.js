@@ -24,8 +24,10 @@ const Desktop = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        console.log('Attempting to log out...');
         console.log('Logging out...');
-        localStorage.removeItem('token'); // ending session
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
         const token = localStorage.getItem('token');
         if (!token) {
             console.log("Token removed successfully.");
@@ -35,10 +37,20 @@ const Desktop = () => {
         }
     }
     
-
+    const handleOpenProfile = () => {
+        console.log('Attempting to open profile...');
+        const username = localStorage.getItem('username');
+        if (username) {
+            navigate(`/profile/${username}`);
+        } else {
+            console.log("No username found.");
+        }
+    }
+    
     return (
         <DesktopContainer>
             <Button onClick={handleLogout}>Log Out</Button>
+            <Button onClick={handleOpenProfile}>Profile</Button>
         </DesktopContainer>
     );
 };

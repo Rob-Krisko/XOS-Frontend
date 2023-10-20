@@ -53,36 +53,38 @@ const FormTitle = styled.h2`
 `;
 
 function Register({ switchToLogin }) {
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [fullName, setFullName] = useState('');
+    const [formData, setFormData] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        fullName: '',
+    });
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     const registerUser = async () => {
-        console.log('Attempting to register...');
-        if(password !== confirmPassword) {
-            console.log('Passwords do not match!');
+        const { username, email, password, confirmPassword, fullName } = formData;
+        if (password !== confirmPassword) {
             setMessage("Passwords do not match!");
             return;
         }
         try {
-            const response = await axios.post('http://localhost:5000/register', {
-                username, email, password, fullName 
-            });
-            console.log('Server response:', response.data);
+            const response = await axios.post('http://localhost:5000/register', { username, email, password, fullName });
             setMessage(response.data.message);
             if (response.data.success) {
-                setMessage("Registration successful! Please login.");
-                switchToLogin(); // switch to login view in the modal
-            } else {
-                console.log("Registration unsuccessful.");
+                switchToLogin();
             }
         } catch (error) {
-            console.log('Error while registering:', error);
-            setMessage(error.response.data.message);
+            setMessage(error.response?.data?.message || 'Registration failed');
         }
     };
 
@@ -90,30 +92,35 @@ function Register({ switchToLogin }) {
         <FormContainer>
             <FormTitle>Register</FormTitle>
             <Input 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)}
+                name="username"
+                value={formData.username} 
+                onChange={handleChange}
                 placeholder="Username"
             />
             <Input 
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
                 placeholder="Full Name"
             />
             <Input 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Email"
             />
             <Input 
+                name="password"
                 type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password} 
+                onChange={handleChange}
                 placeholder="Password"
             />
             <Input 
+                name="confirmPassword"
                 type="password" 
-                value={confirmPassword} 
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword} 
+                onChange={handleChange}
                 placeholder="Confirm Password"
             />
             <Button onClick={registerUser}>Register</Button>

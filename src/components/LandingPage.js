@@ -38,7 +38,7 @@ const Button = styled.button`
 
 const LandingPage = () => {
     const [showModal, setShowModal] = useState(false);
-    const [modalView, setModalView] = useState('login'); // 'login' or 'register'
+    const [modalView, setModalView] = useState('login');
 
     return (
         <LandingContainer>

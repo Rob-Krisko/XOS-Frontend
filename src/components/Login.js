@@ -52,54 +52,59 @@ const FormTitle = styled.h2`
   text-align: center;
 `;
 
-
 function Login({ switchToRegister }) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [message, setMessage] = useState('');
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+      username: '',
+      password: ''
+  });
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
-    const loginUser = async () => {
-        console.log('Attempting to log in...');
-        try {
-            const response = await axios.post('http://localhost:5000/login', {
-                username,
-                password
-            });
-            console.log('Server response:', response.data);
-            setMessage(response.data.message);
-            if (response.status === 200) { 
-                console.log("Token received:", response.data.token);
-                localStorage.setItem('token', response.data.token); // Store the token in local storage for sessions
-                navigate('/desktop');
-            } else {
-                console.log("Login unsuccessful.");
-            }
-        } catch (error) {
-            console.log('Error while logging in:', error);
-            setMessage(error.response?.data?.message || 'Login failed');
-        }
-    };
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData(prev => ({
+          ...prev,
+          [name]: value
+      }));
+  };
 
-    return (
-        <FormContainer>
-            <FormTitle>Login</FormTitle>
-            <Input 
-                value={username} 
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-            />
-            <Input 
-                type="password" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-            />
-            <Button onClick={loginUser}>Login</Button>
-            {message && <Message>{message}</Message>}
-            <Button onClick={switchToRegister}>Register a new account</Button>
-        </FormContainer>
-    );
+  const loginUser = async () => {
+    console.log('Trying to log in with data:', formData);
+      const { username, password } = formData;
+      try {
+          const response = await axios.post('http://localhost:5000/login', { username, password });
+          setMessage(response.data.message);
+          if (response.status === 200) { 
+              localStorage.setItem('token', response.data.token);
+              localStorage.setItem('username', response.data.username);
+              navigate('/desktop');
+          }
+      } catch (error) {
+          setMessage(error.response?.data?.message || 'Login failed');
+      }
+  };
+
+  return (
+    <FormContainer>
+        <FormTitle>Login</FormTitle>
+        <Input 
+            name="username"
+            value={formData.username} 
+            onChange={handleChange}
+            placeholder="Username"
+        />
+        <Input 
+            name="password"
+            type="password" 
+            value={formData.password} 
+            onChange={handleChange}
+            placeholder="Password"
+        />
+        <Button onClick={loginUser}>Login</Button>
+        {message && <Message>{message}</Message>}
+        <Button onClick={switchToRegister}>Register a new account</Button>
+    </FormContainer>
+  );
 }
 
 export default Login;
