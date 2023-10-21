@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import defaultImage from '../images/default.png';
 import styled from 'styled-components';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const ProfileContainer = styled.div`
     display: flex;
@@ -47,39 +47,38 @@ const EditButton = styled.button`
     }
 `;
 
+const BackButton = styled.button`
+    background-color: #2d2d2d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    &:hover {
+        background-color: #1a1a1a;
+    }
+`;
+
 const BASE_URL = process.env.NODE_ENV === 'production' ? 'production URL will go here when we launch real time' : 'http://localhost:5000';
 
 const UserProfile = () => { 
     const { username } = useParams();
-    console.log('Username from route:', username);
+    const navigate = useNavigate();
     const [profile, setProfile] = useState({});
     const [isEditing, setIsEditing] = useState(false);
     const [updatedBio, setUpdatedBio] = useState('');
 
     useEffect(() => {
-        console.log('Trying to fetch profile for username:', username);
-        if (!username) {
-            console.warn('Username is undefined or empty');
-            return;
-        }
-
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
-                if (!token) {
-                    console.warn('No token found in localStorage');
-                    return;
-                }
-
                 const url = `${BASE_URL}/profile/${username}`;
-                console.log('Axios GET URL:', url);
-
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 };
-
                 const response = await axios.get(url, config);
                 setProfile(response.data);
             } catch (error) {
@@ -90,24 +89,19 @@ const UserProfile = () => {
     }, [username]);
 
     const handleEdit = () => {
-        console.log('Edit bio initiated.');
         setUpdatedBio(profile.bio || '');
         setIsEditing(true);
     };
 
     const handleSave = async () => {
-        console.log('Saving bio update...');
         try {
             const token = localStorage.getItem('token');
             const url = `${BASE_URL}/profile/${username}/update`;
-            console.log('Axios PUT URL:', url);
-            
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             };
-    
             const response = await axios.put(url, {
                 bio: updatedBio
             }, config);
@@ -121,6 +115,10 @@ const UserProfile = () => {
         } catch (error) {
             console.error("Error updating profile:", error.response);
         }
+    };
+
+    const navigateToDesktop = () => {
+        navigate('/desktop');
     };
 
     return (
@@ -139,6 +137,7 @@ const UserProfile = () => {
                     <EditButton onClick={handleEdit}>Edit Bio</EditButton>
                 </>
             )}
+            <BackButton onClick={navigateToDesktop}>Back to Desktop</BackButton>
         </ProfileContainer>
     );
 };

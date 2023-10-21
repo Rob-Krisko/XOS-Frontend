@@ -6,6 +6,10 @@ const DesktopContainer = styled.div`
     height: 100vh;
     background-color: #e4e4e4;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 `;
 
 const Button = styled.button`
@@ -13,12 +17,14 @@ const Button = styled.button`
     color: white;
     border: none;
     padding: 10px 20px;
+    margin: 10px;
     border-radius: 5px;
     cursor: pointer;
     &:hover {
         background-color: #b52b27;
     }
 `;
+
 
 const Desktop = () => {
     const navigate = useNavigate();
