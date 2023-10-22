@@ -70,19 +70,24 @@ function Login({ switchToRegister }) {
 
   const loginUser = async () => {
     console.log('Trying to log in with data:', formData);
-      const { username, password } = formData;
-      try {
-          const response = await axios.post('http://localhost:5000/login', { username, password });
-          setMessage(response.data.message);
-          if (response.status === 200) { 
-              localStorage.setItem('token', response.data.token);
-              localStorage.setItem('username', response.data.username);
-              navigate('/desktop');
-          }
-      } catch (error) {
-          setMessage(error.response?.data?.message || 'Login failed');
-      }
-  };
+    const { username, password } = formData;
+    try {
+        const response = await axios.post('http://localhost:5000/login', { username, password });
+        setMessage(response.data.message);
+        if (response.status === 200) { 
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('username', response.data.username);
+            if (response.data.isAdmin) {
+                navigate('/admin-dashboard');
+            } else {
+                navigate('/desktop');
+            }
+        }
+    } catch (error) {
+        setMessage(error.response?.data?.message || 'Login failed');
+    }
+};
+
 
   return (
     <FormContainer>
