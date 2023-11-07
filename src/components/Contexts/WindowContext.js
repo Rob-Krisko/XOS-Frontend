@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react';
 import Calculator from '../Calculator';
+import { v4 as uuidv4 } from 'uuid'
 
 const WindowContext = createContext();
 
@@ -8,24 +9,28 @@ export const WindowProvider = ({ children }) => {
   const [startMenuVisible, setStartMenuVisible] = useState(false);
 
   const minimizeWindow = (id) => {
-    setOpenWindows(prev => prev.map((window, index) => 
-      index === id ? { ...window, isMinimized: true } : window
+    console.log('minimizing window');
+    setOpenWindows(prev => prev.map((window) => 
+      window.id === id ? { ...window, isMinimized: true } : window
     ));
   };
 
-  const restoreWindow = (appName) => {
+  const restoreWindow = (id) => {
+    console.log('restoring window');
     setOpenWindows(prev => prev.map(window => 
-      window.appName === appName ? { ...window, isMinimized: false } : window
+      window.id === id ? { ...window, isMinimized: false } : window
     ));
   };
 
   const closeWindow = (id) => {
-    setOpenWindows(prev => prev.filter((_, index) => index !== id));
+    console.log('closing window');
+    setOpenWindows(prev => prev.filter(window => window.id !== id));
   };
 
   const openApp = (appName) => {
     let appComponent = null;
-  
+    const id = uuidv4();
+
     switch (appName) {
       case 'Calculator':
         appComponent = <Calculator />;
@@ -37,7 +42,7 @@ export const WindowProvider = ({ children }) => {
 
     setOpenWindows(prevWindows => [
       ...prevWindows, 
-      { appName, isMinimized: false, component: appComponent }
+      { id, appName, isMinimized: false, component: appComponent }
     ]);
     setStartMenuVisible(false);
   };

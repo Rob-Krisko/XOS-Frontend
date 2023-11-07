@@ -39,14 +39,14 @@ const WindowButton = styled.div`
 `;
 
 const Taskbar = ({ onStartClick }) => {
-    const { openWindows, restoreWindow, minimizedWindows } = useContext(WindowContext);
+    const { openWindows, restoreWindow } = useContext(WindowContext);
 
     return (
         <TaskbarContainer>
             <StartButton onClick={onStartClick} />
             <OpenWindowsContainer>
                 {openWindows.map(window => (
-                    <WindowButton key={window.appName} onClick={() => restoreWindow(window.appName)}>
+                    <WindowButton key={window.id} onClick={() => restoreWindow(window.id)}>
                         {window.appName}
                     </WindowButton>
                 ))}

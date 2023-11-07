@@ -9,16 +9,15 @@ import { WindowProvider } from './components/Contexts/WindowContext';
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/desktop" element={
-          <WindowProvider>
-            <Desktop />
-          </WindowProvider>
-        } />
-        <Route path="/profile/:username" element={<UserProfile />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      </Routes>
+      <WindowProvider>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/desktop" element={<Desktop />} />
+          <Route path="/profile/:username" element={<UserProfile />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          {/* You can add more routes here as needed */}
+        </Routes>
+      </WindowProvider>
     </Router>
   );
 }

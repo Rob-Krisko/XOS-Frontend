@@ -5,14 +5,14 @@ import { useNavigate } from 'react-router-dom';
 
 const StartMenuContainer = styled.div`
     position: absolute;
-    bottom: 50px; // Adjust this based on your taskbar height
+    bottom: 50px;
     left: 10px;
-    width: 250px; // Adjust width as needed
+    width: 250px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    display: ${props => props.show ? 'block' : 'none'};
+    display: ${props => props.show === 'true' ? 'block' : 'none'};
     z-index: 10;
 `;
 
@@ -45,12 +45,14 @@ const StartMenu = ({ show, onAppClick }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('token'); 
+        localStorage.removeItem('token');
         navigate('/');
     };
 
+    const showPropAsString = show ? 'true' : 'false';
+
     return (
-        <StartMenuContainer show={show}>
+        <StartMenuContainer show={showPropAsString}>
             <StartMenuHeader>Applications</StartMenuHeader>
             <StartMenuList>
                 <AppItem onClick={() => onAppClick('App 1')}>App 1</AppItem>

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import StartMenu from '../StartMenu/StartMenu';
 import Taskbar from '../Taskbar/Taskbar';
@@ -7,6 +7,7 @@ import Wallpaper from './Wallpaper';
 import { WindowProvider } from '../Contexts/WindowContext';
 import WindowContext from '../Contexts/WindowContext';
 import defaultWallpaper from '../../images/default.jpg';
+
 
 const DesktopContainer = styled.div`
     height: 100vh;
@@ -22,27 +23,29 @@ const Desktop = () => {
         setStartMenuVisible(!startMenuVisible);
     };
 
-    return (
-        <WindowProvider> 
-            <DesktopContainer>
-                <Wallpaper image={defaultWallpaper} />
-                
-                {openWindows.map((window, index) => (
-                    <Window
-                        key={index}
-                        id={index}
-                        title={window.appName}
-                        style={{ display: window.isMinimized ? 'none' : 'block' }}
-                    >
+    useEffect(() => {
+        console.log('Start Menu visibility on mount:', startMenuVisible);
+    }, []);
 
-                        {window.component}
-                    </Window>
-                ))}
-                <StartMenu show={startMenuVisible} onAppClick={openApp} />
-                <Taskbar onStartClick={handleStartClick} />
-            </DesktopContainer>
-        </WindowProvider>
+    return (
+        <DesktopContainer>
+            <Wallpaper image={defaultWallpaper} />
+            
+            {openWindows.map((window) => (
+                <Window
+                    key={window.id}
+                    id={window.id}
+                    title={window.appName}
+                    style={{ display: window.isMinimized ? 'none' : 'block' }}
+                >
+                    {window.component}
+                </Window>
+            ))}
+            <StartMenu show={startMenuVisible} onAppClick={openApp} />
+            <Taskbar onStartClick={handleStartClick} />
+        </DesktopContainer>
     );
 };
 
 export default Desktop;
+

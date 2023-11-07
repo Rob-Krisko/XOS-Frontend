@@ -42,15 +42,15 @@ const WindowContent = styled.div`
     padding: 20px;
 `;
 
-const Window = ({ title, children, id }) => {
+const Window = ({ title, children, id, style }) => {
     const { minimizeWindow, closeWindow } = useContext(WindowContext);
 
     const handleMinimize = () => {
-        minimizeWindow(title);
+        minimizeWindow(id);
     };
 
     const handleClose = () => {
-        closeWindow(title);
+        closeWindow(id);
     };
 
     return (
@@ -65,7 +65,7 @@ const Window = ({ title, children, id }) => {
             minHeight={200}
             bounds="parent"
         >
-            <WindowContainer>
+            <WindowContainer style={style}>
                 <WindowHeader>
                     <Title>{title}</Title>
                     <WindowControls>
