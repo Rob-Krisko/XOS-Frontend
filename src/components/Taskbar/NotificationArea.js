@@ -125,58 +125,90 @@ const ModalTitle = styled.h2`
 
 const EventModal = ({ isOpen, onClose, onSubmit, onDelete, eventInfo }) => {
     const [title, setTitle] = useState(eventInfo?.title || '');
-    const [start, setStart] = useState(eventInfo?.start || '');
-    const [end, setEnd] = useState(eventInfo?.end || '');
+    const [start, setStart] = useState('');
+    const [end, setEnd] = useState('');
     const [allDay, setAllDay] = useState(eventInfo?.allDay || false);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit({ title, start, end, allDay, id: eventInfo?.id || createEventId() });
-        onClose();
-    };
+    function formatDateForInput(date) {
+        const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+        const localISOTime = (new Date(date - offsetMs)).toISOString().slice(0, -1);
+        return localISOTime.substring(0, 16);
+      }
 
     useEffect(() => {
+        console.log('Event info:', eventInfo);
         if (eventInfo) {
             setTitle(eventInfo.title || '');
-            setStart(eventInfo.start || '');
-            setEnd(eventInfo.end || '');
+            const startStr = eventInfo.start instanceof Date ? eventInfo.start.toISOString().slice(0, 16) : eventInfo.start.slice(0, 16);
+            const endStr = eventInfo.end instanceof Date ? eventInfo.end.toISOString().slice(0, 16) : eventInfo.end.slice(0, 16);
+            setStart(eventInfo.start ? formatDateForInput(new Date(eventInfo.start)) : '');
+            setEnd(eventInfo.end ? formatDateForInput(new Date(eventInfo.end)) : '');
             setAllDay(eventInfo.allDay || false);
         }
     }, [eventInfo]);
+    
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onSubmit({
+            title,
+            start: new Date(start),
+            end: new Date(end),
+            allDay,
+            _id: eventInfo?._id
+        });
+        onClose();
+    };
 
     const handleDelete = () => {
-        if (eventInfo?.id) {
-            onDelete(eventInfo.id); 
+        if (eventInfo?._id) {
+            onDelete(eventInfo._id); 
         }
         onClose();
     };
 
     return (
         <StyledModal isOpen={isOpen} onRequestClose={onClose} ariaHideApp={false}>
-            <ModalTitle>{eventInfo?.id ? 'Edit Event' : 'Add Event'}</ModalTitle>
+            <ModalTitle>{eventInfo?._id ? 'Edit Event' : 'Add Event'}</ModalTitle>
             <ModalForm onSubmit={handleSubmit}>
                 <ModalLabel>Title</ModalLabel>
-                <ModalInput type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Event Title" />
-                
+                <ModalInput
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Event Title"
+                />
                 <ModalLabel>Start</ModalLabel>
-                <ModalInput type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
-                
+                <ModalInput
+                    type="datetime-local"
+                    value={start}
+                    onChange={(e) => setStart(e.target.value)}
+                />
                 <ModalLabel>End</ModalLabel>
-                <ModalInput type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} />
-
+                <ModalInput
+                    type="datetime-local"
+                    value={end}
+                    onChange={(e) => setEnd(e.target.value)}
+                />
                 <ModalCheckboxContainer>
-                    <ModalCheckbox type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} />
+                    <ModalCheckbox
+                        type="checkbox"
+                        checked={allDay}
+                        onChange={(e) => setAllDay(e.target.checked)}
+                    />
                     <ModalLabel>All Day</ModalLabel>
                 </ModalCheckboxContainer>
-
                 <ModalButton type="submit">Save</ModalButton>
                 <ModalButton type="button" onClick={onClose}>Cancel</ModalButton>
+                {eventInfo && eventInfo.id && ( 
+                    <ModalButton type="button" onClick={() => onDelete(eventInfo.id)}>Delete Event</ModalButton>
+                )}
+
+
             </ModalForm>
-            {eventInfo?.id && (
-                <ModalButton type="button" onClick={handleDelete}>Delete Event</ModalButton>
-            )}
         </StyledModal>
     );
+    
 };
 
 const Weather = () => {
@@ -235,33 +267,16 @@ const NotificationArea = () => {
     const [selectedEvent, setSelectedEvent] = useState(null);
 
     const username = localStorage.getItem('username');
-    console.log("Username: " + username);
-    const jwtToken = localStorage.getItem('token'); 
-    console.log("Token: " + jwtToken);
-    const [userId, setUserId] = useState(null); 
+    const jwtToken = localStorage.getItem('token');
 
-    useEffect(() => {
-        const fetchUserId = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/api/userid/${username}`, {
-                    headers: { Authorization: `Bearer ${jwtToken}` }
-                });
-                setUserId(response.data.userId);
-            } catch (error) {
-                console.error('Error fetching user ID:', error);
-            }
-        };
-    
-        if (username && jwtToken) {
-            fetchUserId();
-        }
-    }, [username, jwtToken]);
-    
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await axios.get(`/api/events/${userId}`, {
-                    headers: { Authorization: `Bearer ${jwtToken}` }
+                const response = await axios.get(`http://localhost:5000/events`, {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 setEvents(response.data.map(event => ({
                     ...event,
@@ -272,11 +287,12 @@ const NotificationArea = () => {
                 console.error('Error fetching events:', error);
             }
         };
-
-        if (userId && jwtToken) {
+    
+        if (jwtToken) {
             fetchEvents();
         }
-    }, [userId, jwtToken]);
+    }, [jwtToken]);
+    
 
     const handleDateTimeClick = () => {
         setShowCalendar(!showCalendar);
@@ -294,7 +310,7 @@ const NotificationArea = () => {
 
     const handleEventClick = (clickInfo) => {
         setSelectedEvent({
-            id: clickInfo.event.id,
+            id: clickInfo.event.extendedProps._id,
             title: clickInfo.event.title,
             start: clickInfo.event.start,
             end: clickInfo.event.end,
@@ -303,14 +319,33 @@ const NotificationArea = () => {
         setModalOpen(true);
         setShowCalendar(false);
     };
+    
+      
 
     const handleEventSubmit = async (eventData) => {
+        const userId = localStorage.getItem('userId');
+    
         try {
-            if (eventData.id) {
-                const response = await axios.put(`/api/events/${eventData.id}`, eventData);
-                setEvents(events.map(event => (event.id === eventData.id ? response.data : event)));
+            const payload = {
+                ...eventData,
+                userId 
+            };
+    
+            if (eventData._id) {
+                const response = await axios.put(`http://localhost:5000/events/${eventData.id}`, payload, {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                setEvents(events.map(event => event.id === eventData.id ? response.data : event));
             } else {
-                const response = await axios.post('/api/events', eventData);
+                const response = await axios.post('http://localhost:5000/events', payload, {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 setEvents([...events, response.data]);
             }
             setModalOpen(false);
@@ -318,17 +353,29 @@ const NotificationArea = () => {
             console.error('Error saving event:', error);
         }
     };
-
+    
     const handleEventDelete = async (eventId) => {
         try {
-            await axios.delete(`/api/events/${eventId}`);
-            setEvents(events.filter(event => event.id !== eventId));
+            if (!eventId) {
+                console.error('Event ID is undefined, cannot delete event');
+                return;
+            }
+            const response = await axios.delete(`http://localhost:5000/events/${eventId}`, {
+                headers: {
+                    Authorization: `Bearer ${jwtToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            setEvents(events.filter(event => event._id !== eventId));
             setModalOpen(false);
         } catch (error) {
             console.error('Error deleting event:', error);
         }
     };
-
+    
+    
+    
+    
     return (
         <AreaContainer>
             <Weather />
@@ -343,6 +390,7 @@ const NotificationArea = () => {
                 onDelete={handleEventDelete}
                 eventInfo={selectedEvent}
             />
+
             {showCalendar && (
                 <CalendarContainer ref={calendarRef}>
                     <StyledFullCalendar
@@ -366,12 +414,5 @@ const NotificationArea = () => {
         </AreaContainer>
     );
 };
-
-
-function createEventId() {
-    return String(eventGuid++);
-}
-
-let eventGuid = 0;
 
 export default NotificationArea;

@@ -81,6 +81,7 @@ function Login({ switchToRegister }) {
         if (response.status === 200) { 
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', response.data.username);
+            localStorage.setItem('userId', response.data.userId);
             navigate(response.data.isAdmin ? '/admin-dashboard' : '/desktop');
         } else {
             setMessage(response.data.message);
@@ -88,7 +89,8 @@ function Login({ switchToRegister }) {
     } catch (error) {
         setMessage(error.response?.data?.message || 'Login failed');
     }
-  };
+};
+
 
   return (
     <FormContainer>
