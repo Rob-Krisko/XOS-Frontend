@@ -58,6 +58,7 @@ const StartMenu = ({ show, onAppClick }) => {
                 <AppItem onClick={() => onAppClick('App 1')}>App 1</AppItem>
                 <AppItem onClick={() => onAppClick('App 2')}>App 2</AppItem>
                 <AppItem onClick={() => onAppClick('Calculator')}>Calculator</AppItem>
+                <AppItem onClick={() => onAppClick('Music Player')}>Music Player</AppItem>
             </StartMenuList>
             <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
         </StartMenuContainer>

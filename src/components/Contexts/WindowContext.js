@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react';
 import Calculator from '../Calculator';
+import MusicPlayer from '../musicPlayer';
 import { v4 as uuidv4 } from 'uuid'
 
 const WindowContext = createContext();
@@ -34,6 +35,10 @@ export const WindowProvider = ({ children }) => {
     switch (appName) {
       case 'Calculator':
         appComponent = <Calculator />;
+        break;
+
+      case 'Music Player':
+        appComponent = <MusicPlayer />;
         break;
       // add in other apps here
       default:

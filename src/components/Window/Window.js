@@ -18,6 +18,9 @@ const WindowHeader = styled.div`
     justify-content: space-between;
     align-items: center;
     cursor: move;
+    &.drag-handle {
+        cursor: move;
+      }
 `;
 
 const Title = styled.span`
@@ -55,18 +58,30 @@ const Window = ({ title, children, id, style }) => {
 
     return (
         <Rnd
+            dragHandleClassName="drag-handle"
             default={{
                 x: 100,
                 y: 100,
-                width: 320,
-                height: 200,
+                width: 640,
+                height: 480,
             }}
-            minWidth={320}
+            minWidth={300}
             minHeight={200}
             bounds="parent"
+
+            enableResizing={{
+                bottom: true,
+                bottomLeft: true,
+                bottomRight: true,
+                left: true,
+                right: true,
+                top: true,
+                topLeft: true,
+                topRight: true,
+            }}
         >
-            <WindowContainer style={style}>
-                <WindowHeader>
+                <WindowContainer style={style}>
+                    <WindowHeader className="drag-handle">
                     <Title>{title}</Title>
                     <WindowControls>
                         <button onClick={handleMinimize}>_</button>
