@@ -21,21 +21,25 @@ const TextEditor = () => {
 
     useEffect(() => {
         if (isQuillInitialized || !editorRef.current) return;
-
-        const editor = new Quill(editorRef.current, {
-            theme: 'snow',
-            modules: {
-                toolbar: '#toolbar',
-            },
-        });
-
-        setIsQuillInitialized(true);
-
-        editor.on('text-change', () => {
-            setContent(editor.root.innerHTML);
-        });
+    
+        const timer = setTimeout(() => {
+            const editor = new Quill(editorRef.current, {
+                theme: 'snow',
+                modules: {
+                    toolbar: '#toolbar',
+                },
+            });
+    
+            setIsQuillInitialized(true);
+    
+            editor.on('text-change', () => {
+                setContent(editor.root.innerHTML);
+            });
+        }, 100);
+    
+        return () => clearTimeout(timer);
     }, [isQuillInitialized]);
-
+    
     useEffect(() => {
         fetchAvailableDocuments();
     }, []);

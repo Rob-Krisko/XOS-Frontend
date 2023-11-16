@@ -6,37 +6,36 @@ import styled from 'styled-components';
 const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   color: white;
 `;
 
 const Input = styled.input`
-  padding: 10px;
-  border: none;
+  padding: 12px;
+  border: 2px solid #667eea;
   border-radius: 5px;
-  background-color: #34495e;
+  background-color: transparent;
   color: white;
   font-size: 1em;
-  transition: background-color 0.3s ease;
 
   &:focus {
-    background-color: #5a7591;
+    border-color: #764ba2;
     outline: none;
   }
 `;
 
 const Button = styled.button`
-  background-color: #e74c3c;
+  background-color: #667eea;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 25px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1em;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #c0392b;
+    background-color: #764ba2;
   }
 `;
 

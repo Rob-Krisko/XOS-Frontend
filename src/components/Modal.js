@@ -15,14 +15,14 @@ const Overlay = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  background-color: #2c3e50;  /* Dark navy color */
-  padding: 20px;
+  background-color: #2c3e50;
+  padding: 25px;
   border-radius: 10px;
   width: 400px;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
   position: relative;
 `;
-
+ 
 const CloseButton = styled.button`
   position: absolute;
   right: 10px;
