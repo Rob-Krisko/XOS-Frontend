@@ -129,43 +129,59 @@ const EventModal = ({ isOpen, onClose, onSubmit, onDelete, eventInfo }) => {
     const [end, setEnd] = useState('');
     const [allDay, setAllDay] = useState(eventInfo?.allDay || false);
 
-    function formatDateForInput(date) {
-        const offsetMs = date.getTimezoneOffset() * 60 * 1000;
-        const localISOTime = (new Date(date - offsetMs)).toISOString().slice(0, -1);
-        return localISOTime.substring(0, 16);
-      }
+    function formatDateForInput(date, isAllDay) {
+        if (!date) return '';
+    
+        if (isAllDay) {
+            return date.toISOString().split('T')[0];
+        } else {
+            const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+            const localISOTime = (new Date(date - offsetMs)).toISOString().slice(0, -1);
+            return localISOTime.substring(0, 16);
+        }
+    }
+    
 
     useEffect(() => {
-        console.log('Event info:', eventInfo);
         if (eventInfo) {
             setTitle(eventInfo.title || '');
-            const startStr = eventInfo.start instanceof Date ? eventInfo.start.toISOString().slice(0, 16) : eventInfo.start.slice(0, 16);
-            const endStr = eventInfo.end instanceof Date ? eventInfo.end.toISOString().slice(0, 16) : eventInfo.end.slice(0, 16);
-            setStart(eventInfo.start ? formatDateForInput(new Date(eventInfo.start)) : '');
-            setEnd(eventInfo.end ? formatDateForInput(new Date(eventInfo.end)) : '');
-            setAllDay(eventInfo.allDay || false);
+            setStart(eventInfo.start ? formatDateForInput(new Date(eventInfo.start), eventInfo.allDay) : '');
+            setEnd(eventInfo.end ? formatDateForInput(new Date(eventInfo.end), eventInfo.allDay) : '');
         }
     }, [eventInfo]);
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        let startDateTime = new Date(start);
+        let endDateTime = new Date(end);
+    
+        if (allDay) {
+            endDateTime = new Date(startDateTime);
+            endDateTime.setDate(endDateTime.getDate() + 1);
+        }
+    
         onSubmit({
             title,
-            start: new Date(start),
-            end: new Date(end),
+            start: startDateTime,
+            end: endDateTime,
             allDay,
             _id: eventInfo?._id
         });
         onClose();
     };
+    
+    
 
     const handleDelete = () => {
-        if (eventInfo?._id) {
-            onDelete(eventInfo._id); 
+        if (eventInfo && eventInfo.id) {
+            onDelete(eventInfo.id);
+        } else {
+            console.error('No event ID provided for deletion');
         }
         onClose();
     };
+    
+    
 
     return (
         <StyledModal isOpen={isOpen} onRequestClose={onClose} ariaHideApp={false}>
@@ -180,13 +196,13 @@ const EventModal = ({ isOpen, onClose, onSubmit, onDelete, eventInfo }) => {
                 />
                 <ModalLabel>Start</ModalLabel>
                 <ModalInput
-                    type="datetime-local"
+                    type={allDay ? "date" : "datetime-local"}
                     value={start}
                     onChange={(e) => setStart(e.target.value)}
                 />
                 <ModalLabel>End</ModalLabel>
                 <ModalInput
-                    type="datetime-local"
+                    type={allDay ? "date" : "datetime-local"}
                     value={end}
                     onChange={(e) => setEnd(e.target.value)}
                 />
@@ -200,15 +216,10 @@ const EventModal = ({ isOpen, onClose, onSubmit, onDelete, eventInfo }) => {
                 </ModalCheckboxContainer>
                 <ModalButton type="submit">Save</ModalButton>
                 <ModalButton type="button" onClick={onClose}>Cancel</ModalButton>
-                {eventInfo && eventInfo.id && ( 
-                    <ModalButton type="button" onClick={() => onDelete(eventInfo.id)}>Delete Event</ModalButton>
-                )}
-
-
+                <ModalButton type="button" onClick={() => handleDelete(eventInfo?._id)}>Delete Event</ModalButton>
             </ModalForm>
         </StyledModal>
     );
-    
 };
 
 const Weather = () => {
@@ -298,16 +309,6 @@ const NotificationArea = () => {
         setShowCalendar(!showCalendar);
     };
 
-    const handleDateSelect = (selectInfo) => {
-        setSelectedEvent({
-            start: selectInfo.startStr,
-            end: selectInfo.endStr,
-            allDay: selectInfo.allDay
-        });
-        setModalOpen(true);
-        setShowCalendar(false);
-    };
-
     const handleEventClick = (clickInfo) => {
         setSelectedEvent({
             id: clickInfo.event.extendedProps._id,
@@ -320,7 +321,15 @@ const NotificationArea = () => {
         setShowCalendar(false);
     };
     
-      
+    const handleDateSelect = (selectInfo) => {
+        setSelectedEvent({
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay
+        });
+        setModalOpen(true);
+        setShowCalendar(false);
+    };
 
     const handleEventSubmit = async (eventData) => {
         const userId = localStorage.getItem('userId');
@@ -332,13 +341,13 @@ const NotificationArea = () => {
             };
     
             if (eventData._id) {
-                const response = await axios.put(`http://localhost:5000/events/${eventData.id}`, payload, {
+                const response = await axios.put(`http://localhost:5000/events/${eventData._id}`, payload, {
                     headers: {
                         Authorization: `Bearer ${jwtToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
-                setEvents(events.map(event => event.id === eventData.id ? response.data : event));
+                setEvents(events.map(event => event._id === eventData._id ? response.data : event));
             } else {
                 const response = await axios.post('http://localhost:5000/events', payload, {
                     headers: {
