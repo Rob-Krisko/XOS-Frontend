@@ -55,10 +55,10 @@ const StartMenu = ({ show, onAppClick }) => {
         <StartMenuContainer show={showPropAsString}>
             <StartMenuHeader>Applications</StartMenuHeader>
             <StartMenuList>
-                <AppItem onClick={() => onAppClick('App 1')}>App 1</AppItem>
-                <AppItem onClick={() => onAppClick('App 2')}>App 2</AppItem>
                 <AppItem onClick={() => onAppClick('Calculator')}>Calculator</AppItem>
                 <AppItem onClick={() => onAppClick('Music Player')}>Music Player</AppItem>
+                <AppItem onClick={() => onAppClick('User Profile')}>User Profile</AppItem>
+                <AppItem onClick={() => onAppClick('Text Editor')}>Text Editor</AppItem>
             </StartMenuList>
             <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
         </StartMenuContainer>

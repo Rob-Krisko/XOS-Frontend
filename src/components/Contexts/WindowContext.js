@@ -1,6 +1,8 @@
 import React, { createContext, useState } from 'react';
 import Calculator from '../Calculator';
 import MusicPlayer from '../musicPlayer';
+import UserProfile from '../UserProfile';
+import TextEditor from '../TextEditor';
 import { v4 as uuidv4 } from 'uuid'
 
 const WindowContext = createContext();
@@ -40,6 +42,15 @@ export const WindowProvider = ({ children }) => {
       case 'Music Player':
         appComponent = <MusicPlayer />;
         break;
+
+      case 'User Profile':
+        appComponent = <UserProfile />;
+        break;
+
+      case 'Text Editor':
+        appComponent = <TextEditor />;
+        break;
+        
       // add in other apps here
       default:
         appComponent = <div>Unknown App</div>;

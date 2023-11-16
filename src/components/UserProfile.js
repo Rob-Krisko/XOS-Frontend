@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import defaultImage from '../images/default.png';
 import styled from 'styled-components';
-import { useParams, useNavigate } from 'react-router-dom';
 
 const ProfileContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    max-width: 600px;
-    margin: 50px auto;
+    max-width: 800px;
+    margin: auto;
     background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
+    @media (max-width: 768px) {
+        max-width: 90%;
+    }
 `;
 
 const ProfileImage = styled.img`
@@ -47,67 +49,68 @@ const EditButton = styled.button`
     }
 `;
 
-const BackButton = styled.button`
-    background-color: #2d2d2d;
-    color: white;
-    border: none;
-    padding: 8px 15px;
+const TextArea = styled.textarea`
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
     border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    &:hover {
-        background-color: #1a1a1a;
-    }
+    border: 1px solid #ccc;
 `;
 
-const BASE_URL = process.env.NODE_ENV === 'production' ? 'production URL will go here when we launch real time' : 'http://localhost:5000';
-
-const UserProfile = () => { 
-    const { username } = useParams();
-    const navigate = useNavigate();
-    const [profile, setProfile] = useState({});
+const UserProfile = () => {
+    const username = localStorage.getItem('username');
+    const [profileData, setProfileData] = useState({
+        username: '',
+        email: '',
+        bio: ''
+    });
     const [isEditing, setIsEditing] = useState(false);
-    const [updatedBio, setUpdatedBio] = useState('');
 
     useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const url = `${BASE_URL}/profile/${username}`;
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${token}`
+        if (username) {
+            const fetchProfile = async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const url = `http://localhost:5000/profile/${username}`;
+                    const config = {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    };
+                    const response = await axios.get(url, config);
+                    if (response.status === 200 && response.data && response.data.userId) {
+                        const { username, email, bio } = response.data.userId;
+                        setProfileData({ username, email, bio: response.data.bio });
                     }
-                };
-                const response = await axios.get(url, config);
-                setProfile(response.data);
-            } catch (error) {
-                console.error("Error fetching profile:", error.response);
-            }
-        };
-        fetchProfile();
+                } catch (error) {
+                    console.error("Error fetching profile:", error.response);
+                }
+            };
+            fetchProfile();
+        } else {
+            console.log("Username not found in local storage.");
+        }
     }, [username]);
 
     const handleEdit = () => {
-        setUpdatedBio(profile.bio || '');
         setIsEditing(true);
     };
 
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            const url = `${BASE_URL}/profile/${username}/update`;
+            const url = `http://localhost:5000/profile/${username}/update`;
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             };
             const response = await axios.put(url, {
-                bio: updatedBio
+                bio: profileData.bio
             }, config);
             
             if (response.status === 200) {
-                setProfile(prev => ({ ...prev, bio: updatedBio }));
+                setProfileData(prev => ({ ...prev, bio: response.data.bio }));
                 setIsEditing(false);
             } else {
                 console.error("Error updating profile. Response:", response.data);
@@ -117,27 +120,33 @@ const UserProfile = () => {
         }
     };
 
-    const navigateToDesktop = () => {
-        navigate('/desktop');
+    const handleChange = (e) => {
+        setProfileData(prev => ({
+            ...prev,
+            bio: e.target.value
+        }));
     };
 
     return (
         <ProfileContainer>
-            <UsernameHeader>{profile.userId?.username || username}'s Profile</UsernameHeader>
-            <ProfileImage src={profile.profilePicture || defaultImage} alt="Profile" />
-            <ProfileDetail>Email: {profile.userId?.email}</ProfileDetail>
+            <UsernameHeader>{profileData.username}'s Profile</UsernameHeader>
+            <ProfileImage src={defaultImage} alt="Profile" />
+            <ProfileDetail>Email: {profileData.email}</ProfileDetail>
             {isEditing ? (
                 <div>
-                    <textarea value={updatedBio} onChange={(e) => setUpdatedBio(e.target.value)} />
-                    <button onClick={handleSave}>Save</button>
+                    <TextArea 
+                      value={profileData.bio} 
+                      onChange={handleChange} 
+                      rows="4"
+                    />
+                    <EditButton onClick={handleSave}>Save</EditButton>
                 </div>
             ) : (
                 <>
-                    <ProfileDetail>Bio: {profile.bio}</ProfileDetail>
+                    <ProfileDetail>Bio: {profileData.bio}</ProfileDetail>
                     <EditButton onClick={handleEdit}>Edit Bio</EditButton>
                 </>
             )}
-            <BackButton onClick={navigateToDesktop}>Back to Desktop</BackButton>
         </ProfileContainer>
     );
 };
